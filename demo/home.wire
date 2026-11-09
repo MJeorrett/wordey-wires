@@ -1,6 +1,7 @@
 wireframe #home
     Box "Home"
     Box "Welcome - edit demo/home.wire and this page reloads"
+    Text "The quick brown fox jumps over the lazy dog."
     Box "Another box"
     Row
         Box "A"
@@ -10,8 +11,6 @@ wireframe #home
         Box "A"
         Box "B"
         Text "C"
-        Box "D"
-        Box "A"
         Box "B"
         Text "C"
         Text "D"

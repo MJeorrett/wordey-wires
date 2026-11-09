@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { loadWire } from "./load.js";
+import { loadWire } from "./load/index.js";
 import { startServer } from "./server.js";
 
 const USAGE = `Usage:

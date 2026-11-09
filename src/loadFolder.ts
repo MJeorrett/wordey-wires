@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { loadWire } from "./load.js";
+import { loadWire } from "./load/index.js";
 import type { WireDocument, Wireframe } from "./types.js";
 
 /**

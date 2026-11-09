@@ -1,24 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { renderWireframe } from "./render.js";
+import { html } from "./testing.js";
 import type { WireNode } from "./types.js";
 
 function render(...children: WireNode[]): string {
   return renderWireframe({ id: "test", children });
-}
-
-/**
- * Lets expectations be written as indented multi-line blocks: drops the blank
- * first/last lines and the indentation shared by every line.
- */
-function html(strings: TemplateStringsArray): string {
-  const lines = strings.raw[0]!.split("\n");
-  if (lines[0]!.trim() === "") lines.shift();
-  if (lines[lines.length - 1]!.trim() === "") lines.pop();
-
-  const indent = Math.min(
-    ...lines.filter((line) => line.trim() !== "").map((line) => line.length - line.trimStart().length),
-  );
-  return lines.map((line) => line.slice(indent)).join("\n");
 }
 
 describe("renderWireframe", () => {
