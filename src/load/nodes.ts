@@ -4,7 +4,7 @@ import type { Field } from "./fields.js";
 import type { Line } from "./lineTree.js";
 import type { TemplateDefinition } from "./templates.js";
 
-const BUILT_IN_ELEMENTS = new Set(["Box", "Text", "Row"]);
+const BUILT_IN_ELEMENTS = new Set(["Box", "Text", "Row", "Form"]);
 
 /** Loads lines into nodes. One line can produce several (a template call) or none (an empty `{children}`). */
 export function loadNodes(lines: Line[], context: Context): WireNode[] {
@@ -39,7 +39,38 @@ function loadLine(original: Line, context: Context): WireNode[] {
     fail(line, context, `unknown element or template "${name}"`);
   }
 
+  if (name === "Form") {
+    return loadForm(line, context);
+  }
+
   return [loadElement(line, context)];
+}
+
+function lookupFields(entity: string, line: Line, context: Context): Field[] {
+  const fields = context.fields.get(entity);
+  if (!fields) {
+    fail(line, context, `unknown data <${entity}> (expected fields/${entity}.csv)`);
+  }
+  return fields;
+}
+
+/** `Form fields=<entity>`: a label and an input box for each field that has an input. */
+function loadForm(line: Line, context: Context): WireNode[] {
+  const match = /^Form\s+fields=<(\w+)>$/.exec(line.content);
+  if (!match) {
+    fail(line, context, "Form needs data, e.g. Form fields=<organisation>");
+  }
+  if (line.children.length > 0) {
+    fail(line, context, "Form cannot have children");
+  }
+
+  return lookupFields(match[1]!, line, context)
+    .filter((field) => field.input !== undefined)
+    .flatMap((field): WireNode[] => {
+      const input: BoxNode = { type: "Box" };
+      if (field.placeholder !== undefined) input.text = field.placeholder;
+      return [{ type: "Box", text: field.label, border: "none" }, input];
+    });
 }
 
 function loadElement(line: Line, context: Context): WireNode {
@@ -138,15 +169,7 @@ function parseArgs(
     if (Object.hasOwn(args, key!)) {
       fail(line, context, `parameter "${key}" given twice`);
     }
-    if (entity === undefined) {
-      args[key!] = value!;
-    } else {
-      const fields = context.fields.get(entity);
-      if (!fields) {
-        fail(line, context, `unknown data <${entity}> (expected fields/${entity}.csv)`);
-      }
-      args[key!] = fields;
-    }
+    args[key!] = entity === undefined ? value! : lookupFields(entity, line, context);
     position = argument.lastIndex;
   }
 

@@ -34,7 +34,8 @@ Each item test-first.
 - [x] Data parameters (`<entity>`) can't be used inside strings (`{fields}` is an error); only `Form`/`Table` will consume them
 
 ### 5. Built-in `Form`
-- [ ] Renders a labelled box plus placeholder box for each field; skips fields whose `input` is `n/a`
+- [x] Renders a labelled box plus placeholder box for each field; skips fields whose `input` is `n/a` (stacked: borderless label, then the input box, empty if the placeholder is `n/a`; every `input` is single-line until the vocabulary item below)
+- [ ] `Form` inside a template: pass the data through (`Form fields={fields}`); today `fields=<entity>` must be written literally
 - [ ] `input` vocabulary: `singleLineText`, `multiLineText`, `dropdown`; error on anything else
 - [ ] Taller box for `multiLineText`, a dropdown indicator for `dropdown`
 - [ ] Renders fields only (buttons are written explicitly in the wireframe)

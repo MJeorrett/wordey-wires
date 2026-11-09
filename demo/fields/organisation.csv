@@ -1,0 +1,5 @@
+label, placeholder, input, examples
+ID, n/a, n/a, 1;2;3
+Name, Please enter the name of the organisation, singleLineText, Org 1;Org 2;Org 3
+Number of Staff, Please enter the number of staff, number, 10;20;30;55;51
+Strapline, Please enter the strapline of the organisation, singleLineText, "We are the best";"We are the worst";"We are the average"
