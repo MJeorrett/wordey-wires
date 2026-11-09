@@ -1,11 +1,12 @@
+import type { Field, FieldRegistry } from "./fields.js";
 import type { Line } from "./lineTree.js";
 import type { TemplateRegistry } from "./templates.js";
 
 /** A template call that is currently being expanded. */
 export interface ActiveTemplate {
   name: string;
-  /** Parameter name -> the string passed by the call. */
-  args: Record<string, string>;
+  /** Parameter name -> the string (`"..."`) or fields (`<entity>`) passed by the call. */
+  args: Record<string, string | Field[]>;
   /** The call's indented lines: what `{children}` expands to. */
   children: Line[];
   /** Line number of the call, for error messages. */
@@ -16,6 +17,7 @@ export interface ActiveTemplate {
 
 export interface Context {
   templates: TemplateRegistry;
+  fields: FieldRegistry;
   /** Set while loading the body of a template. */
   template?: ActiveTemplate;
 }

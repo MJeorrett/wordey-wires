@@ -18,3 +18,14 @@ wireframe #home
             Box "B"
             Box "C"
             Box "D"
+        Row
+            Box
+                Box "Some Stuff"
+                Box "other stuff"
+            Box
+                Box "Box 2 A"
+                Box "Box 2 B"
+                Box "Box 2 C"
+                Row
+                    Box "Box 3 A"
+                    Box "Box 3 B"

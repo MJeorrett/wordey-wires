@@ -27,10 +27,11 @@ Each item test-first.
 - [ ] Templates calling other templates (deliberately not in v1: it's an error for now)
 
 ### 4. Field CSVs
-- [ ] Load `fields/<entity>.csv` (trim whitespace; columns `label, placeholder, input, examples`; `examples` separated by `;`)
-- [ ] `<entity>` data references as props (`fields=<organisation>`); error if the file is missing
-- [ ] `n/a` means "no value" for `placeholder` and `input`
-- [ ] Include `.csv` files in change detection (already watched; check the folder loader reads them)
+- [x] Load `fields/<entity>.csv` (trim whitespace; columns `label, placeholder, input, examples`; `examples` separated by `;`). Files are read lazily, only when referenced; header and column count are validated
+- [x] `<entity>` data references as props (`fields=<organisation>`); error if the file is missing. Done for template calls only; built-in `Form`/`Table` need the shared property parsing from section 2
+- [x] `n/a` means "no value" for `placeholder` and `input`
+- [x] Include `.csv` files in change detection (already watched; check the folder loader reads them)
+- [x] Data parameters (`<entity>`) can't be used inside strings (`{fields}` is an error); only `Form`/`Table` will consume them
 
 ### 5. Built-in `Form`
 - [ ] Renders a labelled box plus placeholder box for each field; skips fields whose `input` is `n/a`

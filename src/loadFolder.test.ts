@@ -67,6 +67,41 @@ describe("loadWireFolder", () => {
     );
   });
 
+  it("lets template calls reference fields/<entity>.csv", () => {
+    write("fields/organisation.csv", "label, placeholder, input, examples\nName, n/a, n/a, A;B\n");
+    write(
+      "a.wire",
+      'template List(fields)\n    Box "List"\n\nwireframe #home\n    List fields=<organisation>\n',
+    );
+
+    expect(loadWireFolder(dir).wireframes).toEqual([
+      { id: "home", children: [{ type: "Box", text: "List" }] },
+    ]);
+  });
+
+  it("rejects a reference to a CSV file that does not exist", () => {
+    write(
+      "a.wire",
+      'template List(fields)\n    Box "List"\n\nwireframe #home\n    List fields=<organisation>\n',
+    );
+
+    expect(() => loadWireFolder(dir)).toThrow(
+      "a.wire: Line 5: unknown data <organisation> (expected fields/organisation.csv)",
+    );
+  });
+
+  it("reports a problem in a referenced CSV file, naming the file", () => {
+    write("fields/organisation.csv", "label, input\nName, singleLineText\n");
+    write(
+      "a.wire",
+      'template List(fields)\n    Box "List"\n\nwireframe #home\n    List fields=<organisation>\n',
+    );
+
+    expect(() => loadWireFolder(dir)).toThrow(
+      'fields/organisation.csv: Line 1: expected header "label, placeholder, input, examples", got "label, input"',
+    );
+  });
+
   it("prefixes load errors with the file name", () => {
     write("pages/bad.wire", "wireframe #home\n    Box Unquoted\n");
 

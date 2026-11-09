@@ -1,6 +1,13 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { collectTemplates, loadWire, type TemplateRegistry } from "./load/index.js";
+import {
+  collectTemplates,
+  loadWire,
+  parseFields,
+  type Field,
+  type FieldRegistry,
+  type TemplateRegistry,
+} from "./load/index.js";
 import type { WireDocument, Wireframe } from "./types.js";
 
 /**
@@ -24,11 +31,13 @@ export function loadWireFolder(dir: string): WireDocument {
     inFile(file, () => collectTemplates(source, templates, file));
   }
 
+  const fields = folderFields(dir);
+
   const wireframes: Wireframe[] = [];
   const definedIn = new Map<string, string>();
 
   for (const { file, source } of sources) {
-    const loaded = inFile(file, () => loadWire(source, templates));
+    const loaded = inFile(file, () => loadWire(source, templates, fields));
 
     for (const wireframe of loaded.wireframes) {
       const existing = definedIn.get(wireframe.id);
@@ -43,6 +52,28 @@ export function loadWireFolder(dir: string): WireDocument {
   }
 
   return { wireframes };
+}
+
+/**
+ * Serves `fields/<entity>.csv` files from `dir`. A file is only read (and
+ * checked) when something references it, so unused CSVs can't break loading.
+ */
+function folderFields(dir: string): FieldRegistry {
+  const cache = new Map<string, Field[]>();
+
+  return {
+    get(entity) {
+      const cached = cache.get(entity);
+      if (cached) return cached;
+
+      const file = `fields/${entity}.csv`;
+      if (!existsSync(join(dir, file))) return undefined;
+
+      const fields = inFile(file, () => parseFields(readFileSync(join(dir, file), "utf8")));
+      cache.set(entity, fields);
+      return fields;
+    },
+  };
 }
 
 /** Runs `work`, prefixing any error with the file it came from. */

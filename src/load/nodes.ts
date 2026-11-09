@@ -1,5 +1,6 @@
 import type { BoxNode, WireNode } from "../types.js";
 import { fail, type Context } from "./context.js";
+import type { Field } from "./fields.js";
 import type { Line } from "./lineTree.js";
 import type { TemplateDefinition } from "./templates.js";
 
@@ -16,7 +17,7 @@ function loadLine(original: Line, context: Context): WireNode[] {
   }
 
   // Inside a template body, parameters are replaced before the line is read.
-  const line = context.template ? substitute(original, context.template.args) : original;
+  const line = context.template ? substitute(original, context, context.template.args) : original;
 
   if (!context.template) {
     const brace = /\{(\w*)\}/.exec(line.content);
@@ -101,6 +102,7 @@ function expandCall(line: Line, template: TemplateDefinition, context: Context):
 
   return loadNodes(template.body, {
     templates: context.templates,
+    fields: context.fields,
     template: {
       name: template.name,
       args,
@@ -111,16 +113,16 @@ function expandCall(line: Line, template: TemplateDefinition, context: Context):
   });
 }
 
-/** Reads `key="value"` arguments from a template call and checks them against its parameters. */
+/** Reads `key="value"` and `key=<entity>` arguments from a template call and checks them against its parameters. */
 function parseArgs(
   line: Line,
   template: TemplateDefinition,
   context: Context,
-): Record<string, string> {
+): Record<string, string | Field[]> {
   const rest = line.content.slice(template.name.length).trim();
-  const args: Record<string, string> = {};
+  const args: Record<string, string | Field[]> = {};
 
-  const argument = /(\w+)="([^"]*)"\s*/y;
+  const argument = /(\w+)=(?:"([^"]*)"|<(\w+)>)\s*/y;
   let position = 0;
   while (position < rest.length) {
     argument.lastIndex = position;
@@ -129,14 +131,22 @@ function parseArgs(
       fail(line, context, `arguments must be written key="value", got "${rest.slice(position)}"`);
     }
 
-    const [, key, value] = match;
+    const [, key, value, entity] = match;
     if (!template.params.includes(key!)) {
       fail(line, context, `${template.name} has no parameter "${key}"`);
     }
     if (Object.hasOwn(args, key!)) {
       fail(line, context, `parameter "${key}" given twice`);
     }
-    args[key!] = value!;
+    if (entity === undefined) {
+      args[key!] = value!;
+    } else {
+      const fields = context.fields.get(entity);
+      if (!fields) {
+        fail(line, context, `unknown data <${entity}> (expected fields/${entity}.csv)`);
+      }
+      args[key!] = fields;
+    }
     position = argument.lastIndex;
   }
 
@@ -149,9 +159,13 @@ function parseArgs(
   return args;
 }
 
-function substitute(line: Line, args: Record<string, string>): Line {
-  const content = line.content.replace(/\{(\w+)\}/g, (whole, name: string) =>
-    Object.hasOwn(args, name) ? args[name]! : whole,
-  );
+function substitute(line: Line, context: Context, args: Record<string, string | Field[]>): Line {
+  const content = line.content.replace(/\{(\w+)\}/g, (whole, name: string) => {
+    const value = args[name];
+    if (Array.isArray(value)) {
+      fail(line, context, `{${name}} holds data, which cannot be used inside text`);
+    }
+    return value ?? whole;
+  });
   return { ...line, content };
 }

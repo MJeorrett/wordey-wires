@@ -1,5 +1,6 @@
 import type { WireDocument, Wireframe } from "../types.js";
 import type { Context } from "./context.js";
+import type { FieldRegistry } from "./fields.js";
 import { parseLineTree, type Line } from "./lineTree.js";
 import { loadNodes } from "./nodes.js";
 import {
@@ -9,6 +10,7 @@ import {
 } from "./templates.js";
 
 export { collectTemplates, type TemplateRegistry } from "./templates.js";
+export { parseFields, type Field, type FieldRegistry } from "./fields.js";
 
 /**
  * Loads .wire source text and evaluates it into a plain JSON-serialisable
@@ -18,10 +20,14 @@ export { collectTemplates, type TemplateRegistry } from "./templates.js";
  * `templates` (see `collectTemplates`) to use a shared set instead, e.g. when
  * loading a folder where templates and wireframes are in different files.
  */
-export function loadWire(source: string, templates?: TemplateRegistry): WireDocument {
+export function loadWire(
+  source: string,
+  templates?: TemplateRegistry,
+  fields: FieldRegistry = new Map(),
+): WireDocument {
   const roots = parseLineTree(source);
   const registry = templates ?? collectTemplatesFromLines(roots, new Map());
-  const context: Context = { templates: registry };
+  const context: Context = { templates: registry, fields };
 
   return {
     wireframes: roots.filter((line) => !isTemplateLine(line)).map((line) => loadWireframe(line, context)),
