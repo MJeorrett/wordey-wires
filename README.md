@@ -45,9 +45,32 @@ wireframe #home
 | `Text "text"` | Like a Box, without the border. |
 | `Row` | Lays its children out side by side. Children share the row in proportion to their `width` (default 3). |
 
+### Templates
+
+Templates are reusable chunks of layout. They can be defined in any `.wire` file in the
+folder and used from any wireframe.
+
+```
+template Page(title)
+    Text "{title}"
+    Box
+        {children}
+
+wireframe #home
+    Page title="Home"
+        Box "Whatever is indented here replaces {children}"
+```
+
+- Parameters are strings and are all required. Call them as `key="value"`.
+- `{name}` inside quoted text is replaced by the argument.
+- `{children}` on its own line is replaced by whatever is indented under the call. A call
+  can only have children if the template has a `{children}` line.
+- Braces are reserved for templates: `{...}` outside a template is an error.
+- A template cannot call another template yet.
+
 Not yet in the loader (the renderer already supports `width` and `align`): `width=`,
-`to=#id` links between wireframes, `align=`, templates, field CSVs, and the built-in
-`Form` and `Table`.
+`to=#id` links between wireframes, `align=`, field CSVs, and the built-in `Form` and
+`Table`.
 
 ## Commands
 

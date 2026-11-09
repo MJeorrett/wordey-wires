@@ -18,12 +18,13 @@ Each item test-first.
 - [ ] Validate `to=#id` points at a real wireframe (at folder level, since targets can be in other files)
 
 ### 3. Templates
-- [ ] `template Name(param, ...)` definitions, shared across all files in the folder
-- [ ] `{param}` substitution inside quoted strings
-- [ ] `{children}` special keyword: slot for the indented children of a call
-- [ ] Calls with properties (`Page title="Home"`) and indented children
-- [ ] Errors: unknown template, missing/unknown params, `{children}` outside a template
-- [ ] Make the `Page` template from `example.wire` load
+- [x] `template Name(param, ...)` definitions, shared across all files in the folder (collected before wireframes load, so file order doesn't matter)
+- [x] `{param}` substitution inside quoted strings
+- [x] `{children}` special keyword: slot for the indented children of a call
+- [x] Calls with string arguments (`Page title="Home"`) and indented children
+- [x] Errors: unknown template, missing/unknown/duplicate params, unquoted arguments, children without a slot, `{children}` outside a template, braces outside templates, duplicate templates, built-in names
+- [ ] Make the `Page` template from `example.wire` load (needs `width=` and `to=` from section 2)
+- [ ] Templates calling other templates (deliberately not in v1: it's an error for now)
 
 ### 4. Field CSVs
 - [ ] Load `fields/<entity>.csv` (trim whitespace; columns `label, placeholder, input, examples`; `examples` separated by `;`)

@@ -1,0 +1,6 @@
+wireframe #templated
+    Page title="Built from a template"
+        Box "These boxes are passed to the template as its children"
+        Row
+            Box "A"
+            Box "B"

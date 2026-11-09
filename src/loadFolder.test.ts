@@ -49,6 +49,24 @@ describe("loadWireFolder", () => {
     );
   });
 
+  it("lets wireframes use templates defined in other files, whatever the file order", () => {
+    write("a-pages.wire", 'wireframe #home\n    Page title="Home"\n');
+    write("z-layout.wire", 'template Page(title)\n    Box "{title}"\n');
+
+    expect(loadWireFolder(dir).wireframes).toEqual([
+      { id: "home", children: [{ type: "Box", text: "Home" }] },
+    ]);
+  });
+
+  it("rejects the same template defined in two files, naming both", () => {
+    write("a.wire", 'template Page(title)\n    Box "{title}"\n');
+    write("b.wire", 'template Page(title)\n    Box "{title}"\n');
+
+    expect(() => loadWireFolder(dir)).toThrow(
+      "b.wire: Line 1: Duplicate template Page (already defined in a.wire, line 1)",
+    );
+  });
+
   it("prefixes load errors with the file name", () => {
     write("pages/bad.wire", "wireframe #home\n    Box Unquoted\n");
 
