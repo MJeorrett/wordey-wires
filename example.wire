@@ -1,0 +1,24 @@
+template Page(title)
+    Text "{title}"
+    Row
+        Box width=3
+            Box "Home" to=#home
+            Box "Organisations" to=#organisations
+        Box width=9
+            {children}
+
+wireframe #home
+    Page title="Home"
+
+wireframe #organisations
+    Page title="Organisations"
+        Row align=right
+            Box "Create" to=#create-organisation
+        Table fields=<organisation>
+
+wireframe #create-organisation
+    Page title="Create Organisation"
+        Form fields=<organisation>
+        Row align=right
+            Box "Cancel" to=#organisations
+            Box "Create" to=#organisations
