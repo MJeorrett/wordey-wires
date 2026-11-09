@@ -44,6 +44,32 @@ function renderBox(box: BoxNode, gridColumn?: string): string[] {
 }
 
 function renderRow(row: RowNode): string[] {
+  if (row.children.length === 0) return ['<div class="row"></div>'];
+
+  return row.align === undefined ? renderFillingRow(row) : renderAlignedRow(row);
+}
+
+/**
+ * Without `align`, the children fill the whole row and share it in proportion
+ * to their widths (a width is a weight, so 2 and 3 split the row 2:3).
+ */
+function renderFillingRow(row: RowNode): string[] {
+  const tracks = row.children
+    .map((node) => `minmax(0, ${node.type === "Box" ? (node.width ?? DEFAULT_SPAN) : DEFAULT_SPAN}fr)`)
+    .join(" ");
+
+  return wrap(
+    `<div class="row" style="grid-template-columns: ${tracks}">`,
+    "</div>",
+    row.children.flatMap(renderNode),
+  );
+}
+
+/**
+ * With `align`, widths are literal columns of the 12-column grid and the
+ * children are positioned left, centre or right within the row.
+ */
+function renderAlignedRow(row: RowNode): string[] {
   const spanOf = (node: WireNode) =>
     node.type === "Box" ? (node.width ?? DEFAULT_SPAN) : 0;
   const totalSpan = row.children.reduce((sum, node) => sum + spanOf(node), 0);
@@ -58,7 +84,6 @@ function renderRow(row: RowNode): string[] {
     return renderBox(node, gridColumn);
   });
 
-  if (children.length === 0) return ['<div class="row"></div>'];
   return wrap('<div class="row">', "</div>", children);
 }
 

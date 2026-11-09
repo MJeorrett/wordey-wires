@@ -62,6 +62,10 @@ function loadWireframe(line: Line): Wireframe {
 }
 
 function loadNode(line: Line): WireNode {
+  if (line.content === "Row") {
+    return { type: "Row", children: line.children.map(loadNode) };
+  }
+
   const match = /^Box(?:\s+"([^"]*)")?$/.exec(line.content);
   if (!match) {
     const unquoted = /^(Box)\s+([^"].*)$/.exec(line.content);
@@ -77,6 +81,9 @@ function loadNode(line: Line): WireNode {
   const box: BoxNode = { type: "Box" };
   if (match[1] !== undefined) {
     box.text = match[1];
+  }
+  if (line.children.length > 0) {
+    box.children = line.children.map(loadNode);
   }
   return box;
 }

@@ -92,7 +92,7 @@ describe("renderWireframe", () => {
       `);
     });
 
-    it("renders boxes with their column widths as grid spans", () => {
+    it("splits the row between children in proportion to their widths", () => {
       expect(
         render({
           type: "Row",
@@ -102,17 +102,51 @@ describe("renderWireframe", () => {
           ],
         }),
       ).toBe(html`
-        <div class="row">
-          <div class="box" style="grid-column: span 3">A</div>
-          <div class="box" style="grid-column: span 9">B</div>
+        <div class="row" style="grid-template-columns: minmax(0, 3fr) minmax(0, 9fr)">
+          <div class="box">A</div>
+          <div class="box">B</div>
         </div>
       `);
     });
 
-    it("gives boxes without a width a default span of 3", () => {
+    it("splits proportionally even when the widths do not add up to 12", () => {
+      expect(
+        render({
+          type: "Row",
+          children: [
+            { type: "Box", text: "A", width: 2 },
+            { type: "Box", text: "B", width: 3 },
+          ],
+        }),
+      ).toBe(html`
+        <div class="row" style="grid-template-columns: minmax(0, 2fr) minmax(0, 3fr)">
+          <div class="box">A</div>
+          <div class="box">B</div>
+        </div>
+      `);
+    });
+
+    it("gives children without a width equal shares of the row", () => {
+      expect(
+        render({
+          type: "Row",
+          children: [
+            { type: "Box", text: "A" },
+            { type: "Box", text: "B" },
+          ],
+        }),
+      ).toBe(html`
+        <div class="row" style="grid-template-columns: minmax(0, 3fr) minmax(0, 3fr)">
+          <div class="box">A</div>
+          <div class="box">B</div>
+        </div>
+      `);
+    });
+
+    it("lets a single child fill the whole row", () => {
       expect(render({ type: "Row", children: [{ type: "Box", text: "A" }] })).toBe(html`
-        <div class="row">
-          <div class="box" style="grid-column: span 3">A</div>
+        <div class="row" style="grid-template-columns: minmax(0, 3fr)">
+          <div class="box">A</div>
         </div>
       `);
     });
@@ -170,8 +204,8 @@ describe("renderWireframe", () => {
           children: [{ type: "Box", text: "Create", to: "create", width: 2 }],
         }),
       ).toBe(html`
-        <div class="row">
-          <a class="box" href="/create" style="grid-column: span 2">Create</a>
+        <div class="row" style="grid-template-columns: minmax(0, 2fr)">
+          <a class="box" href="/create">Create</a>
         </div>
       `);
     });
@@ -189,8 +223,8 @@ describe("renderWireframe", () => {
           ],
         }),
       ).toBe(html`
-        <div class="row">
-          <div class="box" style="grid-column: span 3">
+        <div class="row" style="grid-template-columns: minmax(0, 3fr)">
+          <div class="box">
             <a class="box" href="/home">Home</a>
           </div>
         </div>
