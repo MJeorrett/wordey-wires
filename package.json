@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "dev": "pnpm build && node dist/cli.js serve demo --home home",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

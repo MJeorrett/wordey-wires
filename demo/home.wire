@@ -1,0 +1,4 @@
+wireframe #home
+    Box "Home"
+    Box "Welcome - edit demo/home.wire and this page reloads"
+    Box "Another box"
