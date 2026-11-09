@@ -1,0 +1,31 @@
+---
+description: Test-driven development workflow - write a failing test before any implementation
+alwaysApply: true
+---
+
+# Test-Driven Development
+
+Follow red -> green -> refactor for every feature or bug fix.
+
+1. **Red**: Write a failing test first (Vitest, colocated as `src/<module>.test.ts`). Run `pnpm test` and confirm it fails for the expected reason.
+2. **Green**: Write the minimum code to make it pass. Run `pnpm test` again.
+3. **Refactor**: Clean up with tests green. Run `pnpm typecheck` too.
+
+## Rules
+
+- Never write implementation code without a failing test that requires it.
+- Bug fixes start with a test that reproduces the bug.
+- Add one test at a time; keep each step small.
+- Test behaviour through public functions, not internals.
+- Don't modify existing tests to make them pass unless the requirement has changed.
+- Finish with `pnpm test` and `pnpm typecheck` passing.
+
+## Example
+
+```ts
+// ✅ GOOD: test written first, describing desired behaviour
+it("loads a wire file with a title", () => {
+  expect(load("title: Home").title).toBe("Home");
+});
+// ...then implement `load` until it passes.
+```

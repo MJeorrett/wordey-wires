@@ -9,7 +9,7 @@
 ### 2. Loader: finish the primitives
 Each item test-first.
 - [x] `Row` with indented children (Boxes with indented children load too)
-- [ ] `Text "..."` loads as a Box with `border: "none"`
+- [x] `Text "..."` loads as a Box with `border: "none"` (text required, no children)
 - [ ] Properties: `width=N`, `to=#id`, `align=left|center|right`
 - [ ] One shared rule for element syntax: after the element name, only a quoted string or `key=value` properties; unquoted text is an error (today this check is hardcoded to `Box`)
 - [ ] Reject unknown properties per element
