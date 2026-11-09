@@ -1,7 +1,9 @@
 wireframe #home
     Page title="Home"
+        Text "Organisations"
         Box
-            Form fields=<organisation>
+            Table fields=<organisation>
+        Form fields=<organisation>
         Text "The quick brown fox jumps over the lazy dog."
         
         Row

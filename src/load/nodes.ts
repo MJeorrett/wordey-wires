@@ -4,7 +4,9 @@ import type { Field } from "./fields.js";
 import type { Line } from "./lineTree.js";
 import type { TemplateDefinition } from "./templates.js";
 
-const BUILT_IN_ELEMENTS = new Set(["Box", "Text", "Row", "Form"]);
+const DEFAULT_TABLE_ROWS = 10;
+
+const BUILT_IN_ELEMENTS = new Set(["Box", "Text", "Row", "Form", "Table"]);
 
 /** Loads lines into nodes. One line can produce several (a template call) or none (an empty `{children}`). */
 export function loadNodes(lines: Line[], context: Context): WireNode[] {
@@ -43,7 +45,45 @@ function loadLine(original: Line, context: Context): WireNode[] {
     return loadForm(line, context);
   }
 
+  if (name === "Table") {
+    return loadTable(line, context);
+  }
+
   return [loadElement(line, context)];
+}
+
+/** `Table fields=<entity>`: a header row, then rows of example data. */
+function loadTable(line: Line, context: Context): WireNode[] {
+  const fields = loadDataElementFields("Table", line, context);
+
+  const header: WireNode = {
+    type: "Row",
+    children: fields.map((field): WireNode => ({ type: "Box", text: field.label })),
+  };
+  const rows = Array.from({ length: DEFAULT_TABLE_ROWS }, (_, index): WireNode => ({
+    type: "Row",
+    children: fields.map((field): WireNode => {
+      const box: BoxNode = { type: "Box" };
+      const example = field.examples[index % field.examples.length];
+      if (example !== undefined && example !== "") box.text = example;
+      return box;
+    }),
+  }));
+
+  return [header, ...rows];
+}
+
+/** Reads the `fields=<entity>` of a `Form` or `Table` line and returns that entity's fields. */
+function loadDataElementFields(element: string, line: Line, context: Context): Field[] {
+  const match = new RegExp(`^${element}\\s+fields=<(\\w+)>$`).exec(line.content);
+  if (!match) {
+    fail(line, context, `${element} needs data, e.g. ${element} fields=<organisation>`);
+  }
+  if (line.children.length > 0) {
+    fail(line, context, `${element} cannot have children`);
+  }
+
+  return lookupFields(match[1]!, line, context);
 }
 
 function lookupFields(entity: string, line: Line, context: Context): Field[] {
@@ -56,15 +96,7 @@ function lookupFields(entity: string, line: Line, context: Context): Field[] {
 
 /** `Form fields=<entity>`: a label and an input box for each field that has an input. */
 function loadForm(line: Line, context: Context): WireNode[] {
-  const match = /^Form\s+fields=<(\w+)>$/.exec(line.content);
-  if (!match) {
-    fail(line, context, "Form needs data, e.g. Form fields=<organisation>");
-  }
-  if (line.children.length > 0) {
-    fail(line, context, "Form cannot have children");
-  }
-
-  return lookupFields(match[1]!, line, context)
+  return loadDataElementFields("Form", line, context)
     .filter((field) => field.input !== undefined)
     .flatMap((field): WireNode[] => {
       const input: BoxNode = { type: "Box" };

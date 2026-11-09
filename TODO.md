@@ -41,8 +41,8 @@ Each item test-first.
 - [ ] Renders fields only (buttons are written explicitly in the wireframe)
 
 ### 6. Built-in `Table`
-- [ ] One column per field, header from `label`, data from `examples` (cycled)
-- [ ] 10 rows by default, `rows=N` to override
+- [x] One column per field, header from `label`, data from `examples` (cycled)
+- [ ] 10 rows by default (done, hardcoded), `rows=N` to override
 - [ ] All columns default to width 3 and fill the available space
 
 ### 7. End to end
