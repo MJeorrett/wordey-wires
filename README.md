@@ -68,9 +68,8 @@ wireframe #home
 - Braces are reserved for templates: `{...}` outside a template is an error.
 - A template cannot call another template yet.
 
-Not yet in the loader (the renderer already supports `width` and `align`): `width=`,
-`to=#id` links between wireframes, `align=`, field CSVs, and the built-in `Form` and
-`Table`.
+Not yet in the loader (the renderer already supports `width` and `align`): `width=` and
+`align=`.
 
 ## Commands
 

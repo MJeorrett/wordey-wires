@@ -1,0 +1,4 @@
+wireframe #organisations
+    Page title="Organisations"
+        Box "Create organisation" to=#create-organisation
+        Table fields=<organisation>

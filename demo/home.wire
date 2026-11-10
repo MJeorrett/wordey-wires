@@ -1,34 +1,17 @@
 wireframe #home
-    Page title="Home"
-        Text "Organisations"
-        Box
-            Table fields=<organisation>
-        Form fields=<organisation>
-        Text "The quick brown fox jumps over the lazy dog."
-        
+    Page title="Wordey Wires"
+        Text "Describe a screen in text, get a clickable wireframe. Edit any file in demo/ and the browser reloads."
         Row
-            Box "A"
-            Box "B"
-            Box "C"
-            Box "D"
-            Box "A"
-            Box "B"
-            Text "C"
-            Box "B"
-            Text "C"
-            Text "D"
-            Box "A"
-            Box "B"
-            Box "C"
-            Box "D"
-        Row
-            Box
-                Box "Some Stuff"
-                Box "other stuff"
-            Box
-                Box "Box 2 A"
-                Box "Box 2 B"
-                Box "Box 2 C"
+            Box "Boxes"
+                Text "A box can hold text and other boxes."
+                Box "Like this one"
+            Box "Rows"
+                Text "A row shares its width between its children."
                 Row
-                    Box "Box 3 A"
-                    Box "Box 3 B"
+                    Box "A"
+                    Box "B"
+                    Box "C"
+            Box "Links"
+                Text "A box can link to another wireframe."
+                Box "Go to organisations" to=#organisations
+        Text "Data comes from CSV files, not from the markup. See the organisations pages."

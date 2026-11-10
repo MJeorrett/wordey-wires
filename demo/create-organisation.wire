@@ -1,0 +1,6 @@
+wireframe #create-organisation
+    Page title="Create organisation"
+        Form fields=<organisation>
+        Row
+            Box "Cancel" to=#organisations
+            Box "Create" to=#organisations

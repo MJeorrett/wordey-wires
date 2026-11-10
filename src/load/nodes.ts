@@ -110,18 +110,13 @@ function loadElement(line: Line, context: Context): WireNode {
     return { type: "Row", children: loadNodes(line.children, context) };
   }
 
-  const match = /^(Box|Text)(?:\s+"([^"]*)")?$/.exec(line.content);
-  if (!match) {
-    const unquoted = /^(Box|Text)\s+([^"].*)$/.exec(line.content);
-    if (unquoted) {
-      fail(line, context, `text must be quoted, e.g. ${unquoted[1]} "${unquoted[2]}"`);
-    }
-
+  const element = /^(Box|Text)(?=\s|$)/.exec(line.content)?.[1];
+  if (element === undefined) {
     fail(line, context, `unsupported syntax "${line.content}"`);
   }
 
-  const isText = match[1] === "Text";
-  const text = match[2];
+  const { text, to } = parseBoxArguments(element, line, context);
+  const isText = element === "Text";
 
   // Text is a Box without a border, so it loads as one.
   const box: BoxNode = { type: "Box" };
@@ -138,10 +133,62 @@ function loadElement(line: Line, context: Context): WireNode {
   if (text !== undefined) {
     box.text = text;
   }
+  if (to !== undefined) {
+    box.to = to;
+  }
   if (line.children.length > 0) {
     box.children = loadNodes(line.children, context);
   }
   return box;
+}
+
+/**
+ * Reads what follows `Box`/`Text`: an optional quoted string and `key=value`
+ * properties, in any order.
+ */
+function parseBoxArguments(
+  element: string,
+  line: Line,
+  context: Context,
+): { text?: string; to?: string } {
+  const rest = line.content.slice(element.length).trimEnd();
+  const result: { text?: string; to?: string } = {};
+
+  const token = /\s+(?:"([^"]*)"|(\w+)=(\S*))/y;
+  let position = 0;
+  while (position < rest.length) {
+    token.lastIndex = position;
+    const match = token.exec(rest);
+    if (!match) {
+      const remaining = rest.slice(position);
+      if (result.text === undefined && /^\s+[^"\s]/.test(remaining)) {
+        fail(line, context, `text must be quoted, e.g. ${element} "${remaining.trim()}"`);
+      }
+      fail(line, context, `unsupported syntax "${line.content}"`);
+    }
+
+    const [, text, key, value] = match;
+    if (text !== undefined) {
+      if (result.text !== undefined) {
+        fail(line, context, `${element} has more than one quoted text`);
+      }
+      result.text = text;
+    } else if (key === "to") {
+      if (result.to !== undefined) {
+        fail(line, context, `property "to" given twice`);
+      }
+      const target = /^#([\w-]+)$/.exec(value!);
+      if (!target) {
+        fail(line, context, "to must point at a wireframe, e.g. to=#home");
+      }
+      result.to = target[1]!;
+    } else {
+      fail(line, context, `${element} has no property "${key}"`);
+    }
+    position = token.lastIndex;
+  }
+
+  return result;
 }
 
 /** `{children}`: the lines the caller indented under the template call. */

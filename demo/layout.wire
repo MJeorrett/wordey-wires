@@ -1,4 +1,8 @@
 template Page(title)
     Text "{title}"
+    Row
+        Box "Home" to=#home
+        Box "Organisations" to=#organisations
+        Box "Templates" to=#templates
     Box
         {children}

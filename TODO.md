@@ -10,9 +10,10 @@
 Each item test-first.
 - [x] `Row` with indented children (Boxes with indented children load too)
 - [x] `Text "..."` loads as a Box with `border: "none"` (text required, no children)
-- [ ] Properties: `width=N`, `to=#id`, `align=left|center|right`
-- [ ] One shared rule for element syntax: after the element name, only a quoted string or `key=value` properties; unquoted text is an error (today this check is hardcoded to `Box`)
-- [ ] Reject unknown properties per element
+- [x] Property `to=#id` on `Box`/`Text`; the quoted text and properties can come in any order
+- [ ] Properties: `width=N`, `align=left|center|right` (add a case in `parseBoxArguments` in `src/load/nodes.ts`; `align` needs `Row` to use it too)
+- [x] Shared rule for element syntax on `Box`/`Text`: after the element name, only one quoted string or `key=value` properties; unquoted text is an error. Still to do: apply it to `Row`, which today rejects anything after its name
+- [x] Reject unknown properties on `Box`/`Text` (`Box has no property "colour"`); still to do for `Row`
 - [ ] Validate values: `width` is 1-12, `align` is one of the three values
 - [ ] `align` only valid on Row
 - [ ] Validate `to=#id` points at a real wireframe (at folder level, since targets can be in other files)

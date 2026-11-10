@@ -1,0 +1,7 @@
+wireframe #templates
+    Page title="Templates"
+        Text "The title, the navigation row and this outer box all come from the Page template in layout.wire."
+        Text "Whatever is indented under a template call fills the template's children slot, like these lines."
+        Row
+            Box "Templates are shared across every file in the folder"
+            Box "Parameters are filled in from the call, like this page's title"
